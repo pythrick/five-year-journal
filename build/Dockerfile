@@ -19,9 +19,12 @@ ENV \
     POETRY_VIRTUALENVS_CREATE=false \
     POETRY_NO_INTERACTION=1
 
-RUN apt update -y && apt install -y curl
+RUN apt-get update -y && \
+    apt-get install -y curl==7.74.0 --no-install-recommends && \
+    rm /var/lib/apt/lists/*
 
 # Install Poetry - respects $POETRY_VERSION & $POETRY_HOME
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 RUN curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/install-poetry.py | python
 ENV PATH="$POETRY_HOME/bin:$PATH"
 
@@ -56,8 +59,8 @@ ARG APP_PATH
 
 WORKDIR $APP_PATH
 COPY ./$APP_NAME ./$APP_NAME
-RUN poetry build --format wheel
-RUN poetry export --format requirements.txt --output constraints.txt --without-hashes
+RUN poetry build --format wheel && \
+    poetry export --format requirements.txt --output constraints.txt --without-hashes
 
 # Stage: production
 FROM python:${PYTHON_VERSION}-slim as production
@@ -81,7 +84,7 @@ ENV \
 WORKDIR $APP_PATH
 COPY --from=build $APP_PATH/dist/*.whl ./
 COPY --from=build $APP_PATH/constraints.txt ./
-RUN pip install ./$APP_NAME*.whl --constraint constraints.txt
+RUN pip install --no-cache-dir ./$APP_NAME*.whl --constraint constraints.txt
 
 COPY ./build/entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh

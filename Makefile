@@ -1,5 +1,12 @@
 
+format:
+	poetry run black . && poetry run isort .
 
+lint:
+	poetry run pre-commit install && poetry run pre-commit run -a -v
+
+test:
+	poetry run pytest -sx
 
 deploy:
 	docker build -t five-year-journal --file build/Dockerfile --target production .
