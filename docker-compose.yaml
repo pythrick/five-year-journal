@@ -1,0 +1,17 @@
+version: "3.8"
+
+services:
+  api:
+    build:
+      context: .
+      dockerfile: ./build/Dockerfile
+      target: development
+    image: five-year-journal
+    env_file:
+      - .env
+    ports:
+      - "8000:8000"
+    volumes:
+      - .:/opt/five_year_journal
+    stdin_open: true
+    tty: true
