@@ -1,10 +1,10 @@
 from sqlalchemy.ext.asyncio import create_async_engine
 from sqlmodel import SQLModel
 
-from config import settings
+from five_year_journal.config import settings
 
 engine = create_async_engine(
-    settings.database_dsn, echo=settings.debug, future=True
+    settings.database_dsn.get_secret_value(), echo=settings.debug, future=True
 )
 
 

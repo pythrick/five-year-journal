@@ -1,20 +1,8 @@
-from datetime import datetime
-from uuid import UUID
-
-from httpx import AsyncClient
+from five_year_journal.core.auth import authenticate
 
 
-async def test_new_journal_log_v1(client: AsyncClient):
-    response = await client.post(
-        "/v1/journal-logs/", json={"content": "yyyyy"}
-    )
-    result = response.json()
-
-    assert response.status_code == 201
-    assert len(result["id"]) == 36
-    assert UUID(result["id"])
-    assert result["content"] == "yyyyy"
-    assert result["updatedAt"] is None
-    assert (
-        datetime.utcnow() - datetime.fromisoformat(result["createdAt"])
-    ).total_seconds() < 1
+async def test_auth_authenticate(faker):
+    email = faker.email()
+    result = await authenticate(email)
+    assert result.access_token is not None
+    assert result.refresh_token is not None

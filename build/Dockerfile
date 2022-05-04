@@ -20,13 +20,14 @@ ENV \
     POETRY_NO_INTERACTION=1
 
 RUN apt-get update -y && \
-    apt-get install -y curl==7.74.0 --no-install-recommends && \
-    rm /var/lib/apt/lists/*
+    apt-get install -y curl=7.74.0-1.3+deb11u1 --no-install-recommends && \
+    rm -Rf /var/lib/apt/lists/*
 
 # Install Poetry - respects $POETRY_VERSION & $POETRY_HOME
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 RUN curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/install-poetry.py | python
 ENV PATH="$POETRY_HOME/bin:$PATH"
+ENV PYTHON_PATH="$APP_PATH:$PYTHON_PATH"
 
 # Import our project files
 WORKDIR $APP_PATH
@@ -71,7 +72,8 @@ ARG PORT
 ENV \
     PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
-    PYTHONFAULTHANDLER=1
+    PYTHONFAULTHANDLER=1 \
+    PYTHON_PATH="$APP_PATH:$PYTHON_PATH"
 
 ENV \
     PIP_NO_CACHE_DIR=off \
@@ -79,6 +81,7 @@ ENV \
     PIP_DEFAULT_TIMEOUT=100 \
     APP_NAME=$APP_NAME \
     PORT=$PORT
+
 
 # Get build artifact wheel and install it respecting dependency versions
 WORKDIR $APP_PATH
