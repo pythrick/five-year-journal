@@ -1,7 +1,7 @@
 from functools import lru_cache
 from pathlib import Path
 
-from pydantic import BaseSettings, SecretStr
+from pydantic import BaseSettings, SecretStr, validator
 
 BASE_PATH = Path(__file__).parent.parent.resolve()
 
@@ -16,6 +16,13 @@ class Settings(BaseSettings):
 
     class Config:
         env_file = BASE_PATH / ".env"
+
+    @validator("database_url")
+    def postgres_driver(cls, v: SecretStr):
+        db_url = v.get_secret_value()
+        if db_url.startswith("postgres://"):
+            db_url = db_url.replace("postgres://", "postgresql+asyncpg://")
+        return SecretStr(db_url)
 
 
 @lru_cache
