@@ -4,7 +4,7 @@ from sqlmodel import SQLModel
 from five_year_journal.config import settings
 
 engine = create_async_engine(
-    settings.database_dsn.get_secret_value(), echo=settings.debug, future=True
+    settings.database_url.get_secret_value(), echo=settings.debug, future=True
 )
 
 

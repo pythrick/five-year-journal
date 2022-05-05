@@ -7,7 +7,7 @@ BASE_PATH = Path(__file__).parent.parent.resolve()
 
 
 class Settings(BaseSettings):
-    database_dsn: SecretStr
+    database_url: SecretStr
     api_secret: SecretStr
     debug: bool = False
     access_token_expiration_secs: int = 60 * 60  # 1 hour
